@@ -153,9 +153,12 @@ function buildImageUrls(id, image) {
 function mapImages(data) {
   if (!data) return data;
   
+  // Unwrap GQL response wrapper: data → hybridSearchResults → rails
+  const root = data.hybridSearchResults || data;
+  
   // Handle rails array (search results)
-  if (data.rails && Array.isArray(data.rails)) {
-    data.rails.forEach(rail => {
+  if (root.rails && Array.isArray(root.rails)) {
+    root.rails.forEach(rail => {
       if (rail.contents && Array.isArray(rail.contents)) {
         rail.contents.forEach(item => {
           if (item.id && item.image) {
@@ -169,8 +172,8 @@ function mapImages(data) {
   }
   
   // Handle buckets array (free5/collection)
-  if (data.buckets && Array.isArray(data.buckets)) {
-    data.buckets.forEach(bucket => {
+  if (root.buckets && Array.isArray(root.buckets)) {
+    root.buckets.forEach(bucket => {
       if (bucket.items && Array.isArray(bucket.items)) {
         bucket.items.forEach(item => {
           if (item.id && item.image) {
@@ -184,15 +187,15 @@ function mapImages(data) {
   }
   
   // Handle single item (details, playback)
-  if (data.id && data.image) {
-    const urls = buildImageUrls(data.id, data.image);
-    data.imageUrl = urls.imageUrl;
-    data.imageUrlLandscape = urls.imageUrlLandscape;
+  if (root.id && root.image) {
+    const urls = buildImageUrls(root.id, root.image);
+    root.imageUrl = urls.imageUrl;
+    root.imageUrlLandscape = urls.imageUrlLandscape;
   }
   
   // Handle episodes array
-  if (data.episodes && Array.isArray(data.episodes)) {
-    data.episodes.forEach(ep => {
+  if (root.episodes && Array.isArray(root.episodes)) {
+    root.episodes.forEach(ep => {
       if (ep.id && ep.image) {
         const urls = buildImageUrls(ep.id, ep.image);
         ep.imageUrl = urls.imageUrl;
@@ -202,8 +205,8 @@ function mapImages(data) {
   }
   
   // Handle season array in tvshow details
-  if (data.seasons && Array.isArray(data.seasons)) {
-    data.seasons.forEach(season => {
+  if (root.seasons && Array.isArray(root.seasons)) {
+    root.seasons.forEach(season => {
       if (season.id && season.image) {
         const urls = buildImageUrls(season.id, season.image);
         season.imageUrl = urls.imageUrl;
