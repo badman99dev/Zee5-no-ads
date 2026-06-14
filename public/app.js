@@ -24,11 +24,7 @@ function getImageUrl(item, type = 'portrait') {
   return item.imageUrlLandscape || item.imageUrl || null;
 }
 
-function isFree(biz) {
-  if (!biz) return false;
-  const t = biz.toLowerCase();
-  return t.includes('advertisement') || t.includes('free_downloadable') || t === 'free';
-}
+// isFree function removed - API now filters premium content automatically
 
 // === DOM ===
 const $ = id => document.getElementById(id);
@@ -105,10 +101,9 @@ function initHeroCarousel(items) {
   container.innerHTML = '';
   dots.innerHTML = '';
   
-  const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
-  if (!freeItems.length) return;
+  if (!items.length) return;
   
-  freeItems.slice(0, 8).forEach((item, idx) => {
+  items.slice(0, 8).forEach((item, idx) => {
     const slide = document.createElement('div');
     slide.className = 'hero-slide' + (idx === 0 ? ' active' : '');
     slide.dataset.index = idx;
@@ -127,7 +122,7 @@ function initHeroCarousel(items) {
       <div class="hero-bg" style="${bgUrl ? `background-image:url(${bgUrl})` : `background:linear-gradient(135deg,hsl(${(item.title||'X').length*30},50%,20%),hsl(${(item.title||'X').length*30+40},40%,10%))`}"></div>
       <div class="hero-gradient"></div>
       <div class="hero-content">
-        <div class="hero-badge">${isFree(biz) ? 'FREE' : 'PREMIUM'}</div>
+        <div class="hero-badge">FREE</div>
         <h1 class="hero-title">${item.title || 'Untitled'}</h1>
         <div class="hero-meta">${meta.map(x => `<span>${x}</span>`).join(' <span style="color:var(--text-dim)">·</span> ')}</div>
         <p class="hero-desc">${item.description || item.short_description || ''}</p>
@@ -219,7 +214,7 @@ function makeCard(item) {
     <div class="card-info">
       <div class="card-title">${item.title || 'Untitled'}</div>
       <div class="card-meta">
-        ${isFree(biz) ? '<span class="card-badge">FREE</span>' : ''}
+        ${true ? '<span class="card-badge">FREE</span>' : ''}
         <span>${item.asset_subtype || ''}</span>
       </div>
     </div>
@@ -234,7 +229,7 @@ function makeRail(title, items, total, collId) {
   const rail = document.createElement('div');
   rail.className = 'rail';
   
-  const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
+  const freeItems = items;
   if (!freeItems.length) return null;
   
   const header = document.createElement('div');
@@ -294,7 +289,7 @@ async function loadHome() {
         const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
-        const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
+        const freeItems = items;
         if (!freeItems.length) continue;
         
         heroItems.push(...freeItems.slice(0, 2));
@@ -338,7 +333,7 @@ async function loadFreeTab() {
         const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
-        const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
+        const freeItems = items;
         if (!freeItems.length) continue;
         
         const total = b.total_items || c.total || freeItems.length;
@@ -378,7 +373,7 @@ async function loadFifaTab() {
         const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
-        const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
+        const freeItems = items;
         if (!freeItems.length) continue;
         
         const total = b.total_items || c.total || freeItems.length;
@@ -412,7 +407,7 @@ async function loadMoviesTab() {
         const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
-        const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
+        const freeItems = items;
         if (!freeItems.length) continue;
         
         const total = b.total_items || c.total || freeItems.length;
@@ -446,7 +441,7 @@ async function loadTvShowsTab() {
         const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
-        const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
+        const freeItems = items;
         if (!freeItems.length) continue;
         
         const total = b.total_items || c.total || freeItems.length;
@@ -490,7 +485,7 @@ async function loadMoreCategories() {
         const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
-        const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
+        const freeItems = items;
         if (!freeItems.length) continue;
         
         const total = b.total_items || c.total || freeItems.length;
@@ -534,7 +529,7 @@ async function doSearch(query) {
       const contents = rail.contents || [];
       const freeContents = contents.filter(c => {
         const data = c.movie || c.episode || c.tvShowDetails || c;
-        return isFree(data.business_type || data.businessType || '');
+        return true;
       });
       if (!freeContents.length) continue;
       
@@ -572,7 +567,7 @@ async function openCollectionPage(id, title) {
     
     const buckets = data.buckets || [];
     const items = buckets.length ? buckets.flatMap(b => b.items || []) : (data.items || []);
-    const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
+    const freeItems = items;
     
     const grid = $('collectionGrid');
     grid.innerHTML = '';
@@ -599,7 +594,7 @@ async function loadMoreCollection() {
     const data = await api(`${API}/collection/${collectionPageState.id}?limit=${collectionPageState.limit}&page=${collectionPageState.page}`);
     const buckets = data.buckets || [];
     const items = buckets.length ? buckets.flatMap(b => b.items || []) : (data.items || []);
-    const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
+    const freeItems = items;
     
     btn.remove();
     const grid = $('collectionGrid');
@@ -646,7 +641,7 @@ async function openDetail(id) {
     if (d.duration) m.push(`${Math.round(d.duration/60)} min`);
     if (d.age_rating) m.push(d.age_rating);
     if (d.release_date) m.push(new Date(d.release_date).getFullYear());
-    if (biz) m.push(`<span class="badge">${isFree(biz)?'FREE':'PREMIUM'}</span>`);
+    if (biz) m.push(`<span class="badge">${true?'FREE':'PREMIUM'}</span>`);
     if (d.audio_languages?.length) m.push(d.audio_languages.join(', '));
     $('detailMeta').innerHTML = m.join(' <span style="color:var(--text-dim)">·</span> ');
     $('detailDesc').textContent = d.description || d.short_description || '';
@@ -802,7 +797,7 @@ function renderEpisodes(eps) {
     item.innerHTML = `
       <div class="episode-thumb">${thumb ? `<img src="${thumb}" alt="" loading="lazy">` : ''}</div>
       <div class="episode-info">
-        <div class="episode-title">${ep.title || ep.original_title || 'Untitled'} ${isFree(biz) ? '<span class="card-badge" style="margin-left:6px">FREE</span>' : ''}</div>
+        <div class="episode-title">${ep.title || ep.original_title || 'Untitled'} ${true ? '<span class="card-badge" style="margin-left:6px">FREE</span>' : ''}</div>
         <div class="episode-meta">Ep ${ep.episode_number || '?'}${ep.duration ? ` · ${Math.round(ep.duration/60)} min` : ''}${ep.release_date ? ` · ${new Date(ep.release_date).toLocaleDateString()}` : ''}</div>
       </div>
       <button class="episode-play" onclick="event.stopPropagation();openPlayer('${ep.id}')">

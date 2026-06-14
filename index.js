@@ -8,6 +8,59 @@ const { getContentDetails, getM3u8 } = require('./playback');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+function isFreeContent(biz) {
+  if (!biz) return false;
+  const t = biz.toLowerCase();
+  return t.includes('advertisement') || t.includes('free_downloadable') || t === 'free';
+}
+
+function filterPremium(data) {
+  if (!data) return data;
+  
+  // Handle search results (rails)
+  if (data.data && data.data.hybridSearchResults && data.data.hybridSearchResults.rails) {
+    data.data.hybridSearchResults.rails.forEach(rail => {
+      if (rail.contents) {
+        rail.contents = rail.contents.filter(item => {
+          const data = item.movie || item.episode || item.tvShowDetails || item;
+          return isFreeContent(data.business_type || data.businessType || '');
+        });
+      }
+    });
+    // Remove empty rails
+    data.data.hybridSearchResults.rails = data.data.hybridSearchResults.rails.filter(rail => 
+      rail.contents && rail.contents.length > 0
+    );
+  }
+  
+  // Handle collection buckets
+  if (data.buckets) {
+    data.buckets.forEach(bucket => {
+      if (bucket.items) {
+        bucket.items = bucket.items.filter(item => 
+          isFreeContent(item.business_type || item.businessType || '')
+        );
+      }
+    });
+  }
+  
+  // Handle direct items array
+  if (data.items) {
+    data.items = data.items.filter(item => 
+      isFreeContent(item.business_type || item.businessType || '')
+    );
+  }
+  
+  // Handle episodes
+  if (data.episode) {
+    data.episode = data.episode.filter(item => 
+      isFreeContent(item.business_type || item.businessType || '')
+    );
+  }
+  
+  return data;
+}
+
 app.use(express.json());
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -39,7 +92,7 @@ app.get('/search', async (req, res) => {
     const q = req.query.q;
     if (!q) return res.status(400).json({ error: 'q param required' });
     const data = await search(q, req.query.lang);
-    res.json(data);
+    res.json(filterPremium(data));
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -50,7 +103,7 @@ app.get('/free5', async (req, res) => {
     const page = parseInt(req.query.page) || 0;
     const lang = req.query.lang || '';
     const data = await getFree5(page, lang);
-    res.json(data);
+    res.json(filterPremium(data));
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -61,7 +114,7 @@ app.get('/collection/:id', async (req, res) => {
     const page = parseInt(req.query.page) || 0;
     const limit = parseInt(req.query.limit) || 25;
     const data = await getCollection(req.params.id, page, limit);
-    res.json(data);
+    res.json(filterPremium(data));
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
