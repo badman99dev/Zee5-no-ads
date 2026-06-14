@@ -1,4 +1,4 @@
-# ZEE5 No Ads API
+# ZEE5 No Ads API ·
 
 Reverse-engineered ZEE5 API — search, browse, play free content without ads or DRM.
 
