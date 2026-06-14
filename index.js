@@ -20,7 +20,8 @@ function isPlayable(item) {
 }
 
 function isLiveContent(item) {
-  return item.asset_type === 9 || item.asset_type === '9';
+  const type = item.asset_type || item.assetType;
+  return type === 9 || type === '9';
 }
 
 function isSportsContent(item) {
