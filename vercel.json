@@ -1,1 +1,19 @@
-{"version":2}
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    { "src": "/(free5|search|collection|details|seasons|episodes|m3u8|playback)(.*)", "dest": "index.js" },
+    { "src": "/(.*\\.(html|js|css|png|jpg|ico|svg|json|woff|woff2))", "dest": "public/$1" },
+    { "src": "/", "dest": "public/index.html" },
+    { "src": "/(.*)", "dest": "public/$1" }
+  ]
+}
