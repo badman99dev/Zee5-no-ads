@@ -36,6 +36,7 @@ const $ = id => document.getElementById(id);
 // === STATE ===
 let currentHero = null, heroInterval = null, heroCurrentIndex = 0;
 let free5State = { nextIdx: 0, total: 0, loading: false, seenIds: new Set() };
+let currentTab = 'home';
 let collectionPageState = { id: null, title: '', page: 0, limit: 25, total: 0, loading: false };
 let currentSeasonId = null, currentEpPage = 0, totalEpisodes = 0, loadedEpisodes = 0, seenEpIds = new Set();
 let selectedLangs = new Set();
@@ -277,11 +278,9 @@ function makeRail(title, items, total, collId) {
 async function loadHome() {
   try {
     const lang = getLang();
-    const free5 = await api(`${API}/free5?page=0${lang ? '&lang='+lang : ''}`);
-    const buckets = free5.buckets || [];
-    free5State.total = free5.total || 0;
-    free5State.nextIdx = 1;
-    free5State.seenIds = new Set();
+    // Load homepage content (not FREE5 - general curated content)
+    const home = await api(`${API}/collection/0-8-homepage?limit=${ITEMS_PER_RAIL}`);
+    const buckets = home.buckets || [];
     
     const heroItems = [];
     const rails = $('contentRails');
@@ -289,8 +288,7 @@ async function loadHome() {
     
     for (const b of buckets) {
       const bid = b.id || b.collection_id;
-      if (!bid || free5State.seenIds.has(bid)) continue;
-      free5State.seenIds.add(bid);
+      if (!bid) continue;
       
       try {
         const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
@@ -308,6 +306,46 @@ async function loadHome() {
     
     // Init hero with first 8 free items from all rails
     if (heroItems.length) initHeroCarousel(heroItems.slice(0, 8));
+    else $('heroSection').style.display = 'none';
+    
+    $('loadMoreBtn').style.display = 'none';
+    
+  } catch(e) {
+    console.error('Home fail', e);
+    $('contentRails').innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Failed to load. Please refresh.</p></div>';
+  }
+}
+
+async function loadFreeTab() {
+  try {
+    const lang = getLang();
+    $('heroSection').style.display = 'none';
+    const free5 = await api(`${API}/free5?page=0${lang ? '&lang='+lang : ''}`);
+    const buckets = free5.buckets || [];
+    free5State.total = free5.total || 0;
+    free5State.nextIdx = 1;
+    free5State.seenIds = new Set();
+    
+    const rails = $('contentRails');
+    rails.innerHTML = '';
+    
+    for (const b of buckets) {
+      const bid = b.id || b.collection_id;
+      if (!bid || free5State.seenIds.has(bid)) continue;
+      free5State.seenIds.add(bid);
+      
+      try {
+        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
+        const cb = c.buckets || [];
+        const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
+        const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
+        if (!freeItems.length) continue;
+        
+        const total = b.total_items || c.total || freeItems.length;
+        const rail = makeRail(b.title || c.title, freeItems, total, bid);
+        if (rail) rails.appendChild(rail);
+      } catch(e) { console.log('Rail fail', bid); }
+    }
     
     // Load more button
     const btn = $('loadMoreBtn');
@@ -318,8 +356,150 @@ async function loadHome() {
     } else btn.style.display = 'none';
     
   } catch(e) {
-    console.error('Home fail', e);
-    $('contentRails').innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Failed to load. Please refresh.</p></div>';
+    console.error('Free tab fail', e);
+    $('contentRails').innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Failed to load FREE content. Please refresh.</p></div>';
+  }
+}
+
+async function loadFifaTab() {
+  try {
+    $('heroSection').style.display = 'none';
+    const data = await api(`${API}/collection/0-8-3z5977322?limit=${ITEMS_PER_RAIL}`);
+    const buckets = data.buckets || [];
+    
+    const rails = $('contentRails');
+    rails.innerHTML = '';
+    
+    for (const b of buckets) {
+      const bid = b.id || b.collection_id;
+      if (!bid) continue;
+      
+      try {
+        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
+        const cb = c.buckets || [];
+        const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
+        const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
+        if (!freeItems.length) continue;
+        
+        const total = b.total_items || c.total || freeItems.length;
+        const rail = makeRail(b.title || c.title, freeItems, total, bid);
+        if (rail) rails.appendChild(rail);
+      } catch(e) { console.log('Rail fail', bid); }
+    }
+    
+    $('loadMoreBtn').style.display = 'none';
+    
+  } catch(e) {
+    console.error('FIFA tab fail', e);
+    $('contentRails').innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Failed to load FIFA content. Please refresh.</p></div>';
+  }
+}
+
+async function loadMoviesTab() {
+  try {
+    $('heroSection').style.display = 'none';
+    const data = await api(`${API}/collection/0-8-5016?limit=${ITEMS_PER_RAIL}`);
+    const buckets = data.buckets || [];
+    
+    const rails = $('contentRails');
+    rails.innerHTML = '';
+    
+    for (const b of buckets) {
+      const bid = b.id || b.collection_id;
+      if (!bid) continue;
+      
+      try {
+        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
+        const cb = c.buckets || [];
+        const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
+        const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
+        if (!freeItems.length) continue;
+        
+        const total = b.total_items || c.total || freeItems.length;
+        const rail = makeRail(b.title || c.title, freeItems, total, bid);
+        if (rail) rails.appendChild(rail);
+      } catch(e) { console.log('Rail fail', bid); }
+    }
+    
+    $('loadMoreBtn').style.display = 'none';
+    
+  } catch(e) {
+    console.error('Movies tab fail', e);
+    $('contentRails').innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Failed to load Movies. Please refresh.</p></div>';
+  }
+}
+
+async function loadTvShowsTab() {
+  try {
+    $('heroSection').style.display = 'none';
+    const data = await api(`${API}/collection/0-8-5794?limit=${ITEMS_PER_RAIL}`);
+    const buckets = data.buckets || [];
+    
+    const rails = $('contentRails');
+    rails.innerHTML = '';
+    
+    for (const b of buckets) {
+      const bid = b.id || b.collection_id;
+      if (!bid) continue;
+      
+      try {
+        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
+        const cb = c.buckets || [];
+        const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
+        const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
+        if (!freeItems.length) continue;
+        
+        const total = b.total_items || c.total || freeItems.length;
+        const rail = makeRail(b.title || c.title, freeItems, total, bid);
+        if (rail) rails.appendChild(rail);
+      } catch(e) { console.log('Rail fail', bid); }
+    }
+    
+    $('loadMoreBtn').style.display = 'none';
+    
+  } catch(e) {
+    console.error('TV Shows tab fail', e);
+    $('contentRails').innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Failed to load TV Shows. Please refresh.</p></div>';
+  }
+}
+
+async function loadMoreTab() {
+  try {
+    $('heroSection').style.display = 'none';
+    const rails = $('contentRails');
+    rails.innerHTML = '';
+    
+    // Add popular collections
+    const collections = [
+      { id: '0-8-5016', title: 'Free Movies' },
+      { id: '0-8-5794', title: 'Free TV Shows' },
+      { id: '0-8-3z5266344', title: 'Sports' },
+      { id: '0-8-626', title: 'News' },
+      { id: '0-8-2707', title: 'Music' },
+      { id: '0-8-3z5517520', title: 'Trending Free' },
+      { id: '0-8-3z5861709', title: 'South Free' },
+      { id: '0-8-3z5882645', title: 'Kids Free' },
+    ];
+    
+    for (const col of collections) {
+      try {
+        const c = await api(`${API}/collection/${col.id}?limit=${ITEMS_PER_RAIL}`);
+        const cb = c.buckets || [];
+        const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
+        const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
+        if (!freeItems.length) continue;
+        
+        const total = c.total || freeItems.length;
+        const rail = makeRail(col.title, freeItems, total, col.id);
+        if (rail) rails.appendChild(rail);
+      } catch(e) { console.log('Collection fail', col.id); }
+    }
+    
+    $('loadMoreBtn').style.display = 'none';
+    
+  } catch(e) {
+    console.error('More tab fail', e);
+    $('contentRails').innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Failed to load content. Please refresh.</p></div>';
   }
 }
 
@@ -831,6 +1011,32 @@ document.addEventListener('click', e => {
 $('hamburger').onclick = () => $('mobileMenu').classList.add('open');
 $('mobileMenuClose').onclick = () => $('mobileMenu').classList.remove('open');
 
+// Tab switching
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  
+  $('searchOverlay').style.display = 'none';
+  $('collectionOverlay').style.display = 'none';
+  $('mainContent').style.display = 'block';
+  
+  $('heroSection').style.display = 'block';
+  $('contentRails').innerHTML = '';
+  $('loadMoreBtn').style.display = 'none';
+  free5State = { nextIdx: 0, total: 0, loading: false, seenIds: new Set() };
+  
+  if (tab === 'home') loadHome();
+  else if (tab === 'free') loadFreeTab();
+  else if (tab === 'fifa') loadFifaTab();
+  else if (tab === 'movies') loadMoviesTab();
+  else if (tab === 'tvshows') loadTvShowsTab();
+  else if (tab === 'more') loadMoreTab();
+}
+
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.onclick = () => switchTab(tab.dataset.tab);
+});
+
 // Nav links
 document.querySelectorAll('.nav-link, .mobile-link').forEach(link => {
   link.onclick = e => {
@@ -839,7 +1045,7 @@ document.querySelectorAll('.nav-link, .mobile-link').forEach(link => {
     link.classList.add('active');
     $('mobileMenu').classList.remove('open');
     const p = link.dataset.page;
-    if (p === 'home') { $('mainContent').style.display = 'block'; $('searchOverlay').style.display = 'none'; $('collectionOverlay').style.display = 'none'; }
+    if (p === 'home') { switchTab('home'); }
     else if (p === 'movies') openCollectionPage('0-8-5016', 'Movies');
     else if (p === 'tv') openCollectionPage('0-8-5794', 'TV Shows');
     else if (p === 'collections') openCollectionPage('0-8-5011', 'Collections');

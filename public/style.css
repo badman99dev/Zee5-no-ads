@@ -131,6 +131,83 @@ body {
   border-radius: 1px;
 }
 
+/* === NAVIGATION TABS (Below Search Bar) === */
+.nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 64px;
+  z-index: 999;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.nav-tabs::-webkit-scrollbar { display: none; }
+
+.nav-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  border-radius: var(--radius);
+  min-width: 60px;
+  white-space: nowrap;
+}
+
+.nav-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+}
+
+.nav-tab.active {
+  color: var(--accent-purple);
+  background: rgba(130, 54, 203, 0.15);
+}
+
+.nav-tab svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.5;
+}
+
+.nav-tab.active svg {
+  stroke: var(--accent-purple);
+}
+
+/* Tab specific colors */
+.nav-tab[data-tab="free"].active {
+  color: #00c853;
+  background: rgba(0, 200, 83, 0.15);
+}
+
+.nav-tab[data-tab="free"].active svg {
+  stroke: #00c853;
+}
+
+.nav-tab[data-tab="fifa"].active {
+  color: #ff9800;
+  background: rgba(255, 152, 0, 0.15);
+}
+
+.nav-tab[data-tab="fifa"].active svg {
+  stroke: #ff9800;
+}
+
 .nav-right {
   display: flex;
   align-items: center;
