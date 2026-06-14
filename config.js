@@ -132,19 +132,17 @@ function buildImageUrls(id, image) {
   let portrait = img.portrait || img.portraitclean || '';
   let list = img.list || img.cover || '';
   
-  // If portrait hash doesn't start with a portrait pattern, it's probably invalid
-  // But for now we just use whatever is available
-  
+  // For portrait: use portrait hash if available, otherwise crop center of landscape image
   const imageUrl = portrait 
     ? `${IMG_BASE}/w_400,h_600,c_scale/${IMG_VER}/resources/${id}/portrait/${portrait}.jpg`
     : list 
-      ? `${IMG_BASE}/w_400,h_600,c_scale/${IMG_VER}/resources/${id}/list/${list}.jpg`
+      ? `${IMG_BASE}/w_400,h_600,c_crop,g_center/${IMG_VER}/resources/${id}/list/${list}.jpg`
       : null;
       
   const imageUrlLandscape = list
     ? `${IMG_BASE}/w_800,h_450,c_scale/${IMG_VER}/resources/${id}/list/${list}.jpg`
     : portrait
-      ? `${IMG_BASE}/w_800,h_450,c_scale/${IMG_VER}/resources/${id}/portrait/${portrait}.jpg`
+      ? `${IMG_BASE}/w_800,h_450,c_crop,g_center/${IMG_VER}/resources/${id}/portrait/${portrait}.jpg`
       : null;
       
   return { imageUrl, imageUrlLandscape };
