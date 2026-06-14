@@ -36,7 +36,7 @@ async function getCollection(collectionId, page = 0, limit = 25) {
 
 async function getFree5(page = 0, lang) {
   await initTokens();
-  const params = { translation: 'en', country: 'IN', version: '14', limit: 50, page };
+  const params = { translation: 'en', country: 'IN', version: '14', limit: 20, page };
   if (lang) params.languages = lang;
   const r = await axios.get(`https://gwapi.zee5.com/content/collection/${FREE5_ID}`, {
     params,
