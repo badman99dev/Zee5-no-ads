@@ -23,6 +23,11 @@ function isLiveContent(item) {
   return item.asset_type === 9 || item.asset_type === '9';
 }
 
+function isSportsContent(item) {
+  const subtype = (item.asset_subtype || item.assetSubType || '').toLowerCase();
+  return subtype.includes('sports');
+}
+
 function isFreeContent(biz) {
   if (!biz) return false;
   const t = biz.toLowerCase();
@@ -38,7 +43,7 @@ function filterPremium(data) {
       if (rail.contents) {
         rail.contents = rail.contents.filter(item => {
           const data = item.movie || item.episode || item.tvShowDetails || item;
-          return isFreeContent(data.business_type || data.businessType || '') && isPlayable(data) && !isLiveContent(data);
+          return isFreeContent(data.business_type || data.businessType || '') && isPlayable(data) && !isLiveContent(data) && !isSportsContent(data);
         });
       }
     });
@@ -53,7 +58,7 @@ function filterPremium(data) {
     data.buckets.forEach(bucket => {
       if (bucket.items) {
         bucket.items = bucket.items.filter(item => 
-          isFreeContent(item.business_type || item.businessType || '') && isPlayable(item) && !isLiveContent(item)
+          isFreeContent(item.business_type || item.businessType || '') && isPlayable(item) && !isLiveContent(item) && !isSportsContent(item)
         );
       }
     });
@@ -62,14 +67,14 @@ function filterPremium(data) {
   // Handle direct items array
   if (data.items) {
     data.items = data.items.filter(item => 
-      isFreeContent(item.business_type || item.businessType || '') && isPlayable(item) && !isLiveContent(item)
+      isFreeContent(item.business_type || item.businessType || '') && isPlayable(item) && !isLiveContent(item) && !isSportsContent(item)
     );
   }
   
   // Handle episodes
   if (data.episode) {
     data.episode = data.episode.filter(item => 
-      isFreeContent(item.business_type || item.businessType || '') && isPlayable(item) && !isLiveContent(item)
+      isFreeContent(item.business_type || item.businessType || '') && isPlayable(item) && !isLiveContent(item) && !isSportsContent(item)
     );
   }
   
