@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ZEE5 - Watch Movies, TV Shows, Web Series & Live TV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <div class="nav-left">
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <a href="#" class="nav-logo" id="navLogo">
+          <span class="logo-zee">ZEE</span><span class="logo-five">5</span>
+        </a>
+        <div class="nav-links-desktop">
+          <a href="#" class="nav-link active" data-page="home">Home</a>
+          <a href="#" class="nav-link" data-page="movies">Movies</a>
+          <a href="#" class="nav-link" data-page="tv">TV Shows</a>
+          <a href="#" class="nav-link" data-page="webseries">Web Series</a>
+          <a href="#" class="nav-link" data-page="collections">Collections</a>
+        </div>
+      </div>
+      <div class="nav-right">
+        <div class="nav-search">
+          <input type="text" id="searchInput" placeholder="Search movies, shows, episodes..." autocomplete="off">
+          <button class="search-btn" id="searchBtn" aria-label="Search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="lang-picker" id="langPicker">
+          <button class="lang-trigger" id="langTrigger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M2 12h20"></path>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            <span id="langTriggerText">All Languages</span>
+            <svg class="lang-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+          </button>
+          <div class="lang-dropdown" id="langDropdown">
+            <div class="lang-dropdown-header">
+              <span>Select Languages</span>
+              <button class="lang-clear" id="langClear">Clear All</button>
+            </div>
+            <div class="lang-options" id="langOptions"></div>
+            <div class="lang-dropdown-footer">
+              <button class="lang-apply-btn" id="langApply">Apply</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-header">
+      <span class="logo-zee">ZEE</span><span class="logo-five">5</span>
+      <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
+    </div>
+    <div class="mobile-menu-links">
+      <a href="#" class="mobile-link active" data-page="home">Home</a>
+      <a href="#" class="mobile-link" data-page="movies">Movies</a>
+      <a href="#" class="mobile-link" data-page="tv">TV Shows</a>
+      <a href="#" class="mobile-link" data-page="webseries">Web Series</a>
+      <a href="#" class="mobile-link" data-page="collections">Collections</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main id="mainContent">
+    <!-- Hero Carousel -->
+    <section class="hero-section" id="heroSection">
+      <div class="hero-carousel" id="heroCarousel"></div>
+      <div class="hero-dots" id="heroDots"></div>
+      <button class="hero-arrow hero-arrow-left" id="heroArrowLeft" aria-label="Previous">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="m15 18-6-6 6-6"></path>
+        </svg>
+      </button>
+      <button class="hero-arrow hero-arrow-right" id="heroArrowRight" aria-label="Next">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="m9 18 6-6-6-6"></path>
+        </svg>
+      </button>
+    </section>
+
+    <!-- Content Rails -->
+    <section class="content-rails" id="contentRails"></section>
+
+    <!-- Load More Categories -->
+    <div class="load-more-container" id="loadMoreContainer">
+      <button class="btn-load-more" id="loadMoreBtn" style="display:none">
+        Load More Categories
+      </button>
+    </div>
+  </main>
+
+  <!-- Search Results Overlay -->
+  <section class="search-overlay" id="searchOverlay" style="display:none">
+    <div class="search-header">
+      <h2 class="search-title">Search Results</h2>
+      <button class="search-close" id="searchClose">&times;</button>
+    </div>
+    <div class="search-content" id="searchContent"></div>
+  </section>
+
+  <!-- Collection Page Overlay -->
+  <section class="collection-overlay" id="collectionOverlay" style="display:none">
+    <div class="collection-header">
+      <h2 class="collection-title" id="collectionTitle">Collection</h2>
+      <button class="collection-close" id="collectionClose">&times;</button>
+    </div>
+    <div class="collection-grid" id="collectionGrid"></div>
+  </section>
+
+  <!-- Detail Modal -->
+  <div class="detail-overlay" id="detailOverlay" style="display:none">
+    <div class="detail-content">
+      <button class="detail-close" id="detailClose">&times;</button>
+      <div class="detail-hero" id="detailHero"></div>
+      <div class="detail-body">
+        <div class="detail-info">
+          <h1 class="detail-title" id="detailTitle"></h1>
+          <div class="detail-meta" id="detailMeta"></div>
+          <p class="detail-desc" id="detailDesc"></p>
+          <div class="detail-actions">
+            <button class="btn-watch" id="btnWatch">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"></path>
+              </svg>
+              Watch Now
+            </button>
+            <button class="btn-copy" id="btnCopy">Copy M3U8</button>
+          </div>
+        </div>
+        <div class="detail-seasons" id="detailSeasons" style="display:none">
+          <h3>Seasons</h3>
+          <div class="seasons-list" id="seasonsList"></div>
+        </div>
+        <div class="detail-episodes" id="detailEpisodes" style="display:none">
+          <div class="episodes-header">
+            <h3>Episodes</h3>
+            <span class="episodes-count" id="episodesCount"></span>
+          </div>
+          <div class="episodes-list" id="episodesList"></div>
+          <button class="btn-load-more" id="loadMoreEpisodes" style="display:none">Load More Episodes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Player -->
+  <div class="player-overlay" id="playerOverlay" style="display:none">
+    <button class="player-close" id="playerClose">&times;</button>
+    <div class="player-container">
+      <video id="videoPlayer" controls playsinline crossorigin="anonymous" poster=""></video>
+      <div class="player-fallback" id="playerFallback" style="display:none">
+        <p>Video playback not available in this browser</p>
+        <p class="fallback-url" id="fallbackUrl"></p>
+        <button class="btn-copy" id="copyM3u8">Copy M3U8 URL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer" id="footer">
+    <div class="footer-content">
+      <div class="footer-sections">
+        <div class="footer-section">
+          <h4>Download Apps</h4>
+          <div class="footer-apps">
+            <a href="#" class="app-badge">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5v-17c0-.83.67-1.5 1.5-1.5h15c.83 0 1.5.67 1.5 1.5v17c0 .83-.67 1.5-1.5 1.5h-15c-.83 0-1.5-.67-1.5-1.5z"></path></svg>
+              Google Play
+            </a>
+            <a href="#" class="app-badge">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.21-1.98 1.07-3.11-1.05.05-2.31.7-3.06 1.55-.68.73-1.26 1.88-1.1 3 .93.07 1.88-.42 3.09-1.44z"></path></svg>
+              App Store
+            </a>
+          </div>
+        </div>
+        <div class="footer-section">
+          <h4>Connect with us</h4>
+          <div class="footer-social">
+            <a href="#" aria-label="Facebook"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
+            <a href="#" aria-label="Instagram"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+            <a href="#" aria-label="Twitter"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg></a>
+            <a href="#" aria-label="YouTube"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg></a>
+          </div>
+        </div>
+        <div class="footer-section">
+          <h4>Movies by Language</h4>
+          <div class="footer-links">
+            <a href="#">Hindi Movies</a>
+            <a href="#">Tamil Movies</a>
+            <a href="#">Telugu Movies</a>
+            <a href="#">Marathi Movies</a>
+            <a href="#">Bengali Movies</a>
+          </div>
+        </div>
+        <div class="footer-section">
+          <h4>TV Shows by Language</h4>
+          <div class="footer-links">
+            <a href="#">Hindi TV Shows</a>
+            <a href="#">Tamil TV Shows</a>
+            <a href="#">Telugu TV Shows</a>
+            <a href="#">Marathi TV Shows</a>
+            <a href="#">Kannada TV Shows</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>Copyright &copy; 2026 Zee Entertainment Enterprises Ltd. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="#">About Us</a>
+          <a href="#">Help Center</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Use</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js"></script>
+  <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
