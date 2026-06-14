@@ -192,9 +192,9 @@ function makeCard(item) {
   card.className = 'content-card';
   card.dataset.id = item.id;
   
-  const url = getImageUrl(item, 'portrait');
-  const biz = item.business_type || item.businessType || '';
   const isEpisode = (item.assetSubType || item.asset_subtype || '').toLowerCase() === 'episode';
+  const url = getImageUrl(item, isEpisode ? 'landscape' : 'portrait');
+  const biz = item.business_type || item.businessType || '';
   
   const meta = [];
   if (item.asset_subtype) meta.push(item.asset_subtype);
