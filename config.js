@@ -153,8 +153,9 @@ function buildImageUrls(id, image) {
 function mapImages(data) {
   if (!data) return data;
   
-  // Unwrap GQL response wrapper: data → hybridSearchResults → rails
-  const root = data.hybridSearchResults || data;
+  // Unwrap GQL response wrapper: data → data → hybridSearchResults → rails
+  // (axios already returns parsed JSON, so r.data has top-level 'data' property)
+  const root = data.data?.hybridSearchResults || data.hybridSearchResults || data;
   
   // Handle rails array (search results)
   if (root.rails && Array.isArray(root.rails)) {
