@@ -14,6 +14,11 @@ function isFreeContent(biz) {
   return t.includes('advertisement') || t.includes('free_downloadable') || t === 'free';
 }
 
+function isPlayable(item) {
+  const subtype = (item.asset_subtype || item.assetSubType || '').toLowerCase();
+  return subtype !== 'external_link' && subtype !== 'link';
+}
+
 function filterPremium(data) {
   if (!data) return data;
   
@@ -23,7 +28,7 @@ function filterPremium(data) {
       if (rail.contents) {
         rail.contents = rail.contents.filter(item => {
           const data = item.movie || item.episode || item.tvShowDetails || item;
-          return isFreeContent(data.business_type || data.businessType || '');
+          return isFreeContent(data.business_type || data.businessType || '') && isPlayable(data);
         });
       }
     });
@@ -38,7 +43,7 @@ function filterPremium(data) {
     data.buckets.forEach(bucket => {
       if (bucket.items) {
         bucket.items = bucket.items.filter(item => 
-          isFreeContent(item.business_type || item.businessType || '')
+          isFreeContent(item.business_type || item.businessType || '') && isPlayable(item)
         );
       }
     });
@@ -47,14 +52,14 @@ function filterPremium(data) {
   // Handle direct items array
   if (data.items) {
     data.items = data.items.filter(item => 
-      isFreeContent(item.business_type || item.businessType || '')
+      isFreeContent(item.business_type || item.businessType || '') && isPlayable(item)
     );
   }
   
   // Handle episodes
   if (data.episode) {
     data.episode = data.episode.filter(item => 
-      isFreeContent(item.business_type || item.businessType || '')
+      isFreeContent(item.business_type || item.businessType || '') && isPlayable(item)
     );
   }
   
