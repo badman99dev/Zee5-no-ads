@@ -24,7 +24,7 @@ async function getEpisodes(seasonId, limit = 25, page = 0) {
       type: 'episode',
       translation: 'en',
       country: 'in',
-      on_air: 'true',
+      on_air: 'false',
       version: 14,
       asset_subtype: 'tvshow',
       limit,
