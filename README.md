@@ -4,12 +4,6 @@ Reverse-engineered ZEE5 API — search, browse, play free content without ads or
 
 No login required. No official SDK. Just clean JSON endpoints.
 
-<!-- 
-Vercel auto-deploy config
-Email: badman993944@gmail.com
-Username: badman99dev
--->
-
 ## Quick Start
 
 ```bash
