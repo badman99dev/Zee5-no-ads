@@ -194,13 +194,14 @@ function makeCard(item) {
   
   const url = getImageUrl(item, 'portrait');
   const biz = item.business_type || item.businessType || '';
+  const isEpisode = (item.assetSubType || item.asset_subtype || '').toLowerCase() === 'episode';
   
   const meta = [];
   if (item.asset_subtype) meta.push(item.asset_subtype);
   if (item.duration) meta.push(`${Math.round(item.duration/60)}m`);
   
   card.innerHTML = `
-    <div class="card-image">
+    <div class="card-image${isEpisode ? ' landscape' : ''}">
       ${url ? `<img src="${url}" alt="${item.title}" loading="lazy" onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,hsl(${(item.title||'X').length*30},50%,20%),hsl(${(item.title||'X').length*30+40},40%,10%)')">` : ''}
       <div class="card-gradient"></div>
       <div class="card-popup">

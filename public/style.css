@@ -486,6 +486,9 @@ body {
 
 .card-image {
   position: relative; aspect-ratio: 2/3; border-radius: var(--radius);
+}
+.card-image.landscape {
+  aspect-ratio: 16/9;
   overflow: hidden; background: linear-gradient(135deg, #2a2a3a, #1a1a2a);
   box-shadow: var(--shadow-sm);
 }
