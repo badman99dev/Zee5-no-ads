@@ -82,9 +82,10 @@ app.get('/seasons/:showId', async (req, res) => {
 
 app.get('/episodes/:seasonId', async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 100;
-    const data = await getEpisodes(req.params.seasonId, limit);
-    res.json({ seasonId: req.params.seasonId, count: data.length, episodes: data });
+    const limit = parseInt(req.query.limit) || 25;
+    const page = parseInt(req.query.page) || 0;
+    const data = await getEpisodes(req.params.seasonId, limit, page);
+    res.json({ seasonId: req.params.seasonId, ...data });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
