@@ -463,45 +463,7 @@ async function loadTvShowsTab() {
   }
 }
 
-async function loadMoreTab() {
-  try {
-    $('heroSection').style.display = 'none';
-    const rails = $('contentRails');
-    rails.innerHTML = '';
-    
-    // Add popular collections
-    const collections = [
-      { id: '0-8-5016', title: 'Free Movies' },
-      { id: '0-8-5794', title: 'Free TV Shows' },
-      { id: '0-8-3z5266344', title: 'Sports' },
-      { id: '0-8-626', title: 'News' },
-      { id: '0-8-2707', title: 'Music' },
-      { id: '0-8-3z5517520', title: 'Trending Free' },
-      { id: '0-8-3z5861709', title: 'South Free' },
-      { id: '0-8-3z5882645', title: 'Kids Free' },
-    ];
-    
-    for (const col of collections) {
-      try {
-        const c = await api(`${API}/collection/${col.id}?limit=${ITEMS_PER_RAIL}`);
-        const cb = c.buckets || [];
-        const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
-        const freeItems = items.filter(i => isFree(i.business_type || i.businessType || ''));
-        if (!freeItems.length) continue;
-        
-        const total = c.total || freeItems.length;
-        const rail = makeRail(col.title, freeItems, total, col.id);
-        if (rail) rails.appendChild(rail);
-      } catch(e) { console.log('Collection fail', col.id); }
-    }
-    
-    $('loadMoreBtn').style.display = 'none';
-    
-  } catch(e) {
-    console.error('More tab fail', e);
-    $('contentRails').innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Failed to load content. Please refresh.</p></div>';
-  }
-}
+
 
 async function loadMoreCategories() {
   const btn = $('loadMoreBtn');
@@ -1030,7 +992,6 @@ function switchTab(tab) {
   else if (tab === 'fifa') loadFifaTab();
   else if (tab === 'movies') loadMoviesTab();
   else if (tab === 'tvshows') loadTvShowsTab();
-  else if (tab === 'more') loadMoreTab();
 }
 
 document.querySelectorAll('.nav-tab').forEach(tab => {
