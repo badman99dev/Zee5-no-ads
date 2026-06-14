@@ -34,10 +34,10 @@ async function getCollection(collectionId, page = 0, limit = 25) {
   return r.data;
 }
 
-async function getFree5() {
+async function getFree5(page = 0) {
   await initTokens();
   const r = await axios.get(`https://gwapi.zee5.com/content/collection/${FREE5_ID}`, {
-    params: { translation: 'en', country: 'IN', version: '14', limit: 50, page: 0 },
+    params: { translation: 'en', country: 'IN', version: '14', limit: 50, page },
     headers: authHeaders(),
   });
   return r.data;

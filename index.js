@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
     note: 'All endpoints return raw ZEE5 response. Tokens managed internally.',
     endpoints: {
       search: 'GET /search?q=query&lang=hi,en',
-      free5: 'GET /free5 (raw FREE5 collection)',
+      free5: 'GET /free5?page=0 (paginated buckets, total=104)',
       collection: 'GET /collection/:id?page=0&limit=25',
       details: 'GET /details/:id',
       seasons: 'GET /seasons/:showId',
@@ -47,7 +47,8 @@ app.get('/search', async (req, res) => {
 
 app.get('/free5', async (req, res) => {
   try {
-    const data = await getFree5();
+    const page = parseInt(req.query.page) || 0;
+    const data = await getFree5(page);
     res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
