@@ -118,7 +118,8 @@ app.get('/collection/:id', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 0;
     const limit = parseInt(req.query.limit) || 25;
-    const data = await getCollection(req.params.id, page, limit);
+    const lang = req.query.languages || '';
+    const data = await getCollection(req.params.id, page, limit, lang);
     res.json(filterPremium(data));
   } catch (e) {
     res.status(500).json({ error: e.message });

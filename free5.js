@@ -24,11 +24,13 @@ const COLLECTIONS = {
   kids_free: '0-8-3z5882645',
 };
 
-async function getCollection(collectionId, page = 0, limit = 25) {
+async function getCollection(collectionId, page = 0, limit = 25, lang) {
   await initTokens();
   const cid = COLLECTIONS[collectionId] || collectionId;
+  const params = { translation: 'en', country: 'IN', version: '14', limit, page };
+  if (lang) params.languages = lang;
   const r = await axios.get(`https://gwapi.zee5.com/content/collection/${cid}`, {
-    params: { translation: 'en', country: 'IN', version: '14', limit, page },
+    params,
     headers: authHeaders(),
   });
   return mapImages(r.data);
