@@ -37,6 +37,20 @@ let collectionPageState = { id: null, title: '', page: 0, limit: 25, total: 0, l
 let currentSeasonId = null, currentEpPage = 0, totalEpisodes = 0, loadedEpisodes = 0, seenEpIds = new Set();
 let selectedLangs = new Set();
 
+function saveLangs() {
+  localStorage.setItem('zee5_langs', JSON.stringify([...selectedLangs]));
+}
+
+function loadLangs() {
+  try {
+    const saved = localStorage.getItem('zee5_langs');
+    if (saved) {
+      const codes = JSON.parse(saved);
+      selectedLangs = new Set(codes);
+    }
+  } catch (e) {}
+}
+
 const LANGUAGES = [
   { code: 'hi', label: 'Hindi' }, { code: 'hr', label: 'Bhojpuri' },
   { code: 'mr', label: 'Marathi' }, { code: 'te', label: 'Telugu' },
@@ -55,11 +69,12 @@ async function api(url) {
 
 // === LANG PICKER ===
 function initLangPicker() {
+  loadLangs(); // Load saved languages first
   const opts = $('langOptions');
   opts.innerHTML = '';
   LANGUAGES.forEach(l => {
     const opt = document.createElement('div');
-    opt.className = 'lang-option';
+    opt.className = 'lang-option' + (selectedLangs.has(l.code) ? ' selected' : '');
     opt.dataset.code = l.code;
     opt.innerHTML = `<div class="lang-checkbox">✓</div><span class="lang-option-label">${l.label}</span><span class="lang-option-code">${l.code}</span>`;
     opt.onclick = e => {
@@ -67,6 +82,7 @@ function initLangPicker() {
       if (selectedLangs.has(l.code)) { selectedLangs.delete(l.code); opt.classList.remove('selected'); }
       else { selectedLangs.add(l.code); opt.classList.add('selected'); }
       updateLangTrigger();
+      saveLangs(); // Save on change
     };
     opts.appendChild(opt);
   });
@@ -951,9 +967,11 @@ $('langClear').onclick = e => {
   e.stopPropagation(); selectedLangs.clear();
   document.querySelectorAll('.lang-option').forEach(o => o.classList.remove('selected'));
   updateLangTrigger();
+  saveLangs();
 };
 $('langApply').onclick = e => {
   e.stopPropagation(); closeLangDropdown();
+  saveLangs();
   free5State = { nextIdx: 0, total: 0, loading: false, seenIds: new Set() };
   $('contentRails').innerHTML = '';
   stopHeroAutoplay();
