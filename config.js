@@ -6,10 +6,24 @@ const APP_VERSION = '5.79.9';
 const XFF_IP = '103.48.198.48';
 const CF_PROXY = 'https://zee5stream-proxy.badman993944.workers.dev';
 
+const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL || '';
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || '';
+
 let platformToken = '';
 let guestToken = '';
 let deviceId = '';
 let tokenExpiry = 0;
+
+async function redis(cmd, ...args) {
+  if (!REDIS_URL || !REDIS_TOKEN) return null;
+  try {
+    const r = await axios.post(REDIS_URL, [cmd, ...args], {
+      headers: { Authorization: `Bearer ${REDIS_TOKEN}` },
+      timeout: 3000,
+    });
+    return r.data?.result;
+  } catch(e) { return null; }
+}
 
 function generateDeviceId() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -41,6 +55,23 @@ function authHeaders() {
 async function initTokens() {
   if (platformToken && guestToken && Date.now() < tokenExpiry) return;
 
+  // Try Redis cache first
+  const cached = await redis('GET', 'zee5:tokens');
+  if (cached) {
+    try {
+      const t = JSON.parse(cached);
+      if (t.platformToken && t.guestToken && t.deviceId && Date.now() < t.expiry) {
+        platformToken = t.platformToken;
+        guestToken = t.guestToken;
+        deviceId = t.deviceId;
+        tokenExpiry = t.expiry;
+        console.log('[config] tokens from redis cache');
+        return;
+      }
+    } catch(e) {}
+  }
+
+  // Generate fresh tokens
   if (!deviceId) deviceId = generateDeviceId();
 
   const r1 = await axios.get('https://launchapi.zee5.com/launch?platform_name=androidtv', {
@@ -61,7 +92,17 @@ async function initTokens() {
   });
   guestToken = r2.data.guest_user || r2.data.token || '';
   tokenExpiry = Date.now() + 86400000;
-  console.log(`[config] tokens refreshed | platform=${platformToken.slice(0, 20)}... | guest=${guestToken.slice(0, 20)}...`);
+
+  // Cache in Redis (23hr TTL to be safe)
+  const cacheData = JSON.stringify({
+    platformToken,
+    guestToken,
+    deviceId,
+    expiry: tokenExpiry,
+  });
+  await redis('SETEX', 'zee5:tokens', '82800', cacheData);
+
+  console.log(`[config] tokens fresh | platform=${platformToken.slice(0, 20)}... | guest=${guestToken.slice(0, 20)}...`);
 }
 
 function cleanM3u8(hls) {
