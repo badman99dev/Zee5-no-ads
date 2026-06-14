@@ -121,12 +121,117 @@ function proxiedM3u8(hls) {
   return `${CF_PROXY}/https://zee5vod.akamaized.net${clean}`;
 }
 
+const IMG_BASE = 'https://akamaividz2.zee5.com/image/upload';
+const IMG_VER = 'v1557819982';
+
+function buildImageUrls(id, image) {
+  if (!image) return { imageUrl: null, imageUrlLandscape: null };
+  
+  const img = typeof image === 'string' ? { list: image } : image;
+  
+  let portrait = img.portrait || img.portraitclean || '';
+  let list = img.list || img.cover || '';
+  
+  // If portrait hash doesn't start with a portrait pattern, it's probably invalid
+  // But for now we just use whatever is available
+  
+  const imageUrl = portrait 
+    ? `${IMG_BASE}/w_400,h_600,c_scale/${IMG_VER}/resources/${id}/portrait/${portrait}.jpg`
+    : list 
+      ? `${IMG_BASE}/w_400,h_600,c_scale/${IMG_VER}/resources/${id}/list/${list}.jpg`
+      : null;
+      
+  const imageUrlLandscape = list
+    ? `${IMG_BASE}/w_800,h_450,c_scale/${IMG_VER}/resources/${id}/list/${list}.jpg`
+    : portrait
+      ? `${IMG_BASE}/w_800,h_450,c_scale/${IMG_VER}/resources/${id}/portrait/${portrait}.jpg`
+      : null;
+      
+  return { imageUrl, imageUrlLandscape };
+}
+
+function mapImages(data) {
+  if (!data) return data;
+  
+  // Handle rails array (search results)
+  if (data.rails && Array.isArray(data.rails)) {
+    data.rails.forEach(rail => {
+      if (rail.contents && Array.isArray(rail.contents)) {
+        rail.contents.forEach(item => {
+          if (item.id && item.image) {
+            const urls = buildImageUrls(item.id, item.image);
+            item.imageUrl = urls.imageUrl;
+            item.imageUrlLandscape = urls.imageUrlLandscape;
+          }
+        });
+      }
+    });
+  }
+  
+  // Handle buckets array (free5/collection)
+  if (data.buckets && Array.isArray(data.buckets)) {
+    data.buckets.forEach(bucket => {
+      if (bucket.items && Array.isArray(bucket.items)) {
+        bucket.items.forEach(item => {
+          if (item.id && item.image) {
+            const urls = buildImageUrls(item.id, item.image);
+            item.imageUrl = urls.imageUrl;
+            item.imageUrlLandscape = urls.imageUrlLandscape;
+          }
+        });
+      }
+    });
+  }
+  
+  // Handle single item (details, playback)
+  if (data.id && data.image) {
+    const urls = buildImageUrls(data.id, data.image);
+    data.imageUrl = urls.imageUrl;
+    data.imageUrlLandscape = urls.imageUrlLandscape;
+  }
+  
+  // Handle episodes array
+  if (data.episodes && Array.isArray(data.episodes)) {
+    data.episodes.forEach(ep => {
+      if (ep.id && ep.image) {
+        const urls = buildImageUrls(ep.id, ep.image);
+        ep.imageUrl = urls.imageUrl;
+        ep.imageUrlLandscape = urls.imageUrlLandscape;
+      }
+    });
+  }
+  
+  // Handle season array in tvshow details
+  if (data.seasons && Array.isArray(data.seasons)) {
+    data.seasons.forEach(season => {
+      if (season.id && season.image) {
+        const urls = buildImageUrls(season.id, season.image);
+        season.imageUrl = urls.imageUrl;
+        season.imageUrlLandscape = urls.imageUrlLandscape;
+      }
+      if (season.episodes && Array.isArray(season.episodes)) {
+        season.episodes.forEach(ep => {
+          if (ep.id && ep.image) {
+            const urls = buildImageUrls(ep.id, ep.image);
+            ep.imageUrl = urls.imageUrl;
+            ep.imageUrlLandscape = urls.imageUrlLandscape;
+          }
+        });
+      }
+    });
+  }
+  
+  return data;
+}
+
 module.exports = {
   initTokens,
   commonHeaders,
   authHeaders,
   cleanM3u8,
   proxiedM3u8,
+  buildImageUrls,
+  mapImages,
   G_ID,
   ESK_SECRET,
   APP_VERSION,

@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { initTokens, authHeaders } = require('./config');
+const { initTokens, authHeaders, mapImages } = require('./config');
 
 const FREE5_ID = '0-8-5011';
 
@@ -31,7 +31,7 @@ async function getCollection(collectionId, page = 0, limit = 25) {
     params: { translation: 'en', country: 'IN', version: '14', limit, page },
     headers: authHeaders(),
   });
-  return r.data;
+  return mapImages(r.data);
 }
 
 async function getFree5(page = 0, lang) {
@@ -42,7 +42,7 @@ async function getFree5(page = 0, lang) {
     params,
     headers: authHeaders(),
   });
-  return r.data;
+  return mapImages(r.data);
 }
 
 module.exports = { getCollection, getFree5, COLLECTIONS };

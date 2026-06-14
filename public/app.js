@@ -18,6 +18,12 @@ function imgPort(id, h) { return h ? `${IMG_BASE}/w_400,h_600,c_scale/${IMG_VER}
 function imgLand(id, h) { return h ? `${IMG_BASE}/w_800,h_450,c_scale/${IMG_VER}/resources/${id}/list/${h}.jpg` : null; }
 function imgHero(id, h) { return h ? `${IMG_BASE}/w_1920,h_800,c_scale/${IMG_VER}/resources/${id}/list/${h}.jpg` : null; }
 
+function getImageUrl(item, type = 'portrait') {
+  if (!item) return null;
+  if (type === 'portrait') return item.imageUrl || item.imageUrlLandscape || null;
+  return item.imageUrlLandscape || item.imageUrl || null;
+}
+
 function isFree(biz) {
   if (!biz) return false;
   const t = biz.toLowerCase();
@@ -107,8 +113,7 @@ function initHeroCarousel(items) {
     slide.dataset.index = idx;
     slide.dataset.id = item.id;
     
-    const h = imgHash(item.image, 'list');
-    const bgUrl = imgHero(item.id, h) || imgLand(item.id, h);
+    const bgUrl = getImageUrl(item, 'landscape');
     
     const biz = item.business_type || item.businessType || '';
     const meta = [];
@@ -187,8 +192,7 @@ function makeCard(item) {
   card.className = 'content-card';
   card.dataset.id = item.id;
   
-  const h = imgHash(item.image, 'portrait');
-  const url = imgPort(item.id, h);
+  const url = getImageUrl(item, 'portrait');
   const biz = item.business_type || item.businessType || '';
   
   const meta = [];
@@ -484,8 +488,7 @@ async function openDetail(id) {
   
   try {
     const d = await api(`${API}/details/${id}`);
-    const h = imgHash(d.image, 'list');
-    const url = imgHero(d.id, h) || imgLand(d.id, h);
+    const url = getImageUrl(d, 'landscape');
     if (url) {
       $('detailHero').setAttribute('style', `background-image:url(${url});background-size:cover;background-position:center;`);
     } else {
@@ -651,8 +654,7 @@ function renderEpisodes(eps) {
     const item = document.createElement('div');
     item.className = 'episode-item';
     const biz = ep.business_type || ep.businessType || '';
-    const h = imgHash(ep.image, 'list');
-    const thumb = imgLand(ep.id, h);
+    const thumb = getImageUrl(ep, 'landscape');
     
     item.innerHTML = `
       <div class="episode-thumb">${thumb ? `<img src="${thumb}" alt="" loading="lazy">` : ''}</div>

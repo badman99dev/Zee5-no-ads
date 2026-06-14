@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { initTokens, authHeaders } = require('./config');
+const { initTokens, authHeaders, mapImages } = require('./config');
 
 async function getSeasons(showId) {
   await initTokens();
@@ -13,7 +13,7 @@ async function getSeasons(showId) {
     headers: authHeaders(),
     timeout: 15000,
   });
-  return r.data;
+  return mapImages(r.data);
 }
 
 async function getEpisodes(seasonId, limit = 25, page = 0) {
@@ -32,7 +32,7 @@ async function getEpisodes(seasonId, limit = 25, page = 0) {
     },
     headers: authHeaders(),
   });
-  return r.data;
+  return mapImages(r.data);
 }
 
 module.exports = { getSeasons, getEpisodes };
