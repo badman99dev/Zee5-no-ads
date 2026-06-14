@@ -290,7 +290,7 @@ async function loadHome() {
   try {
     const lang = getLang();
     // Load homepage content (not FREE5 - general curated content)
-    const home = await api(`${API}/collection/0-8-homepage?limit=${ITEMS_PER_RAIL}`);
+    const home = await api(`${API}/collection/0-8-homepage?limit=${ITEMS_PER_RAIL}${lang ? '&languages='+lang : ''}`);
     const buckets = home.buckets || [];
     
     const heroItems = [];
@@ -302,7 +302,7 @@ async function loadHome() {
       if (!bid) continue;
       
       try {
-        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
+        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}${lang ? '${lang ? '&languages='+lang : '}languages='+lang : ''}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
         const freeItems = items;
@@ -346,7 +346,7 @@ async function loadFreeTab() {
       free5State.seenIds.add(bid);
       
       try {
-        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
+        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}${lang ? '${lang ? '&languages='+lang : '}languages='+lang : ''}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
         const freeItems = items;
@@ -372,44 +372,11 @@ async function loadFreeTab() {
   }
 }
 
-async function loadFifaTab() {
-  try {
-    $('heroSection').style.display = 'none';
-    const data = await api(`${API}/collection/0-8-3z5977322?limit=${ITEMS_PER_RAIL}`);
-    const buckets = data.buckets || [];
-    
-    const rails = $('contentRails');
-    rails.innerHTML = '';
-    
-    for (const b of buckets) {
-      const bid = b.id || b.collection_id;
-      if (!bid) continue;
-      
-      try {
-        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
-        const cb = c.buckets || [];
-        const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
-        const freeItems = items;
-        if (!freeItems.length) continue;
-        
-        const total = b.total_items || c.total || freeItems.length;
-        const rail = makeRail(b.title || c.title, freeItems, total, bid);
-        if (rail) rails.appendChild(rail);
-      } catch(e) { console.log('Rail fail', bid); }
-    }
-    
-    $('loadMoreBtn').style.display = 'none';
-    
-  } catch(e) {
-    console.error('FIFA tab fail', e);
-    $('contentRails').innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Failed to load FIFA content. Please refresh.</p></div>';
-  }
-}
-
 async function loadMoviesTab() {
   try {
+    const lang = getLang();
     $('heroSection').style.display = 'none';
-    const data = await api(`${API}/collection/0-8-5016?limit=${ITEMS_PER_RAIL}`);
+    const data = await api(`${API}/collection/0-8-5016?limit=${ITEMS_PER_RAIL}${lang ? '&languages='+lang : ''}`);
     const buckets = data.buckets || [];
     
     const rails = $('contentRails');
@@ -420,7 +387,7 @@ async function loadMoviesTab() {
       if (!bid) continue;
       
       try {
-        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
+        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}${lang ? '${lang ? '&languages='+lang : '}languages='+lang : ''}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
         const freeItems = items;
@@ -442,8 +409,9 @@ async function loadMoviesTab() {
 
 async function loadTvShowsTab() {
   try {
+    const lang = getLang();
     $('heroSection').style.display = 'none';
-    const data = await api(`${API}/collection/0-8-5794?limit=${ITEMS_PER_RAIL}`);
+    const data = await api(`${API}/collection/0-8-5794?limit=${ITEMS_PER_RAIL}${lang ? '&languages='+lang : ''}`);
     const buckets = data.buckets || [];
     
     const rails = $('contentRails');
@@ -454,7 +422,7 @@ async function loadTvShowsTab() {
       if (!bid) continue;
       
       try {
-        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
+        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}${lang ? '${lang ? '&languages='+lang : '}languages='+lang : ''}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
         const freeItems = items;
@@ -498,7 +466,7 @@ async function loadMoreCategories() {
       free5State.seenIds.add(bid);
       
       try {
-        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}`);
+        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}${lang ? '${lang ? '&languages='+lang : '}languages='+lang : ''}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
         const freeItems = items;
@@ -577,7 +545,8 @@ async function openCollectionPage(id, title) {
   $('collectionGrid').innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Loading...</p></div>';
   
   try {
-    const data = await api(`${API}/collection/${id}?limit=${collectionPageState.limit}&page=0`);
+    const lang = getLang();
+    const data = await api(`${API}/collection/${id}?limit=${collectionPageState.limit}&page=0${lang ? '&languages='+lang : ''}`);
     collectionPageState.total = data.total || 0;
     collectionPageState.page = 0;
     
@@ -607,7 +576,8 @@ async function loadMoreCollection() {
   
   try {
     collectionPageState.page++;
-    const data = await api(`${API}/collection/${collectionPageState.id}?limit=${collectionPageState.limit}&page=${collectionPageState.page}`);
+    const lang = getLang();
+    const data = await api(`${API}/collection/${collectionPageState.id}?limit=${collectionPageState.limit}&page=${collectionPageState.page}${lang ? '&languages='+lang : ''}`);
     const buckets = data.buckets || [];
     const items = buckets.length ? buckets.flatMap(b => b.items || []) : (data.items || []);
     const freeItems = items;
@@ -1002,7 +972,6 @@ function switchTab(tab) {
   
   if (tab === 'home') loadHome();
   else if (tab === 'free') loadFreeTab();
-  else if (tab === 'fifa') loadFifaTab();
   else if (tab === 'movies') loadMoviesTab();
   else if (tab === 'tvshows') loadTvShowsTab();
 }
