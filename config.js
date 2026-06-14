@@ -192,16 +192,18 @@ function mapImages(data) {
     root.imageUrlLandscape = urls.imageUrlLandscape;
   }
   
-  // Handle episodes array
-  if (root.episodes && Array.isArray(root.episodes)) {
-    root.episodes.forEach(ep => {
-      if (ep.id && ep.image) {
-        const urls = buildImageUrls(ep.id, ep.image);
-        ep.imageUrl = urls.imageUrl;
-        ep.imageUrlLandscape = urls.imageUrlLandscape;
-      }
-    });
-  }
+  // Handle episodes array (both plural and singular forms)
+  ['episodes', 'episode'].forEach(key => {
+    if (root[key] && Array.isArray(root[key])) {
+      root[key].forEach(ep => {
+        if (ep.id && ep.image) {
+          const urls = buildImageUrls(ep.id, ep.image);
+          ep.imageUrl = urls.imageUrl;
+          ep.imageUrlLandscape = urls.imageUrlLandscape;
+        }
+      });
+    }
+  });
   
   // Handle season array in tvshow details
   if (root.seasons && Array.isArray(root.seasons)) {
@@ -211,15 +213,17 @@ function mapImages(data) {
         season.imageUrl = urls.imageUrl;
         season.imageUrlLandscape = urls.imageUrlLandscape;
       }
-      if (season.episodes && Array.isArray(season.episodes)) {
-        season.episodes.forEach(ep => {
-          if (ep.id && ep.image) {
-            const urls = buildImageUrls(ep.id, ep.image);
-            ep.imageUrl = urls.imageUrl;
-            ep.imageUrlLandscape = urls.imageUrlLandscape;
-          }
-        });
-      }
+      ['episodes', 'episode'].forEach(key => {
+        if (season[key] && Array.isArray(season[key])) {
+          season[key].forEach(ep => {
+            if (ep.id && ep.image) {
+              const urls = buildImageUrls(ep.id, ep.image);
+              ep.imageUrl = urls.imageUrl;
+              ep.imageUrlLandscape = urls.imageUrlLandscape;
+            }
+          });
+        }
+      });
     });
   }
   
