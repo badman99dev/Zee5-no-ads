@@ -20,14 +20,15 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
   res.json({
     name: 'ZEE5 No Ads API',
+    note: 'All endpoints return raw ZEE5 response. Tokens managed internally.',
     endpoints: {
-      search: 'GET /search?q=query',
-      free5: 'GET /free5',
+      search: 'GET /search?q=query&lang=hi,en',
+      free5: 'GET /free5 (raw FREE5 collection)',
       collection: 'GET /collection/:id?page=0&limit=25',
       details: 'GET /details/:id',
       seasons: 'GET /seasons/:showId',
-      episodes: 'GET /episodes/:seasonId?limit=100',
-      m3u8: 'GET /m3u8/:id?proxy=0',
+      episodes: 'GET /episodes/:seasonId?limit=25&page=0',
+      m3u8: 'GET /m3u8/:id (raw details + direct/proxied/free)',
       collections: 'GET /collections',
     },
   });
@@ -37,8 +38,8 @@ app.get('/search', async (req, res) => {
   try {
     const q = req.query.q;
     if (!q) return res.status(400).json({ error: 'q param required' });
-    const results = await search(q, req.query.lang);
-    res.json({ query: q, count: results.length, results });
+    const data = await search(q, req.query.lang);
+    res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -46,8 +47,8 @@ app.get('/search', async (req, res) => {
 
 app.get('/free5', async (req, res) => {
   try {
-    const rails = await getFree5();
-    res.json({ rails });
+    const data = await getFree5();
+    res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -80,7 +81,6 @@ app.get('/details/:id', async (req, res) => {
 app.get('/seasons/:showId', async (req, res) => {
   try {
     const data = await getSeasons(req.params.showId);
-    if (!data) return res.status(404).json({ error: 'show not found' });
     res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -92,7 +92,7 @@ app.get('/episodes/:seasonId', async (req, res) => {
     const limit = parseInt(req.query.limit) || 25;
     const page = parseInt(req.query.page) || 0;
     const data = await getEpisodes(req.params.seasonId, limit, page);
-    res.json({ seasonId: req.params.seasonId, ...data });
+    res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -100,8 +100,7 @@ app.get('/episodes/:seasonId', async (req, res) => {
 
 app.get('/m3u8/:id', async (req, res) => {
   try {
-    const useProxy = req.query.proxy === '1';
-    const data = await getM3u8(req.params.id, useProxy);
+    const data = await getM3u8(req.params.id);
     res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });

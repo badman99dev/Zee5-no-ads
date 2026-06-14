@@ -13,22 +13,7 @@ async function getSeasons(showId) {
     headers: authHeaders(),
     timeout: 15000,
   });
-
-  const data = r.data;
-  const seasons = data.seasons || [];
-  return {
-    id: data.id,
-    title: data.title,
-    totalSeasons: data.total_seasons || seasons.length,
-    seasons: seasons.map(s => ({
-      id: s.id,
-      title: s.title,
-      index: s.index,
-      totalEpisodes: s.total_episodes || 0,
-      episodeCount: (s.episodes || []).length,
-      nextEpisodesApi: s.next_episodes_api || null,
-    })),
-  };
+  return r.data;
 }
 
 async function getEpisodes(seasonId, limit = 25, page = 0) {
@@ -47,23 +32,7 @@ async function getEpisodes(seasonId, limit = 25, page = 0) {
     },
     headers: authHeaders(),
   });
-
-  const data = r.data;
-  const episodes = data.episode || data.episodes || [];
-  return {
-    total: data.total || data.total_episodes || 0,
-    page: data.page || page,
-    nextPage: data.next_episodes_api || null,
-    episodes: episodes.map(ep => ({
-      id: ep.id,
-      title: ep.title || '',
-      episodeNumber: ep.episode_number || 0,
-      businessType: ep.business_type || '',
-      duration: ep.duration || 0,
-      image: ep.image?.list || ep.list_image || '',
-      releaseDate: ep.release_date || '',
-    })),
-  };
+  return r.data;
 }
 
 module.exports = { getSeasons, getEpisodes };

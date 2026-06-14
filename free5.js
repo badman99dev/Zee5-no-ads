@@ -31,31 +31,7 @@ async function getCollection(collectionId, page = 0, limit = 25) {
     params: { translation: 'en', country: 'IN', version: '14', limit, page },
     headers: authHeaders(),
   });
-
-  const d = r.data;
-  const buckets = d.buckets || [];
-  const items = [];
-
-  for (const b of buckets) {
-    const bItems = b.items || [];
-    for (const it of bItems) {
-      if (typeof it === 'object' && it.id) {
-        items.push({
-          id: it.id,
-          title: it.title || '',
-          businessType: it.business_type || it.businessType || '',
-          image: it.image?.list || it.image_url?.list || '',
-        });
-      }
-    }
-  }
-
-  return {
-    id: d.id || cid,
-    title: d.title || '',
-    total: d.total || items.length,
-    items,
-  };
+  return r.data;
 }
 
 async function getFree5() {
@@ -64,13 +40,7 @@ async function getFree5() {
     params: { translation: 'en', country: 'IN', version: '14', limit: 50, page: 0 },
     headers: authHeaders(),
   });
-
-  const buckets = r.data.buckets || [];
-  return buckets.map(b => ({
-    id: b.id || '',
-    title: b.title || '',
-    total: b.total_items || b.total || (b.items || []).length,
-  }));
+  return r.data;
 }
 
 module.exports = { getCollection, getFree5, COLLECTIONS };

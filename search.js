@@ -30,28 +30,7 @@ async function search(query, lang = 'hi,en') {
     },
     timeout: 15000,
   });
-
-  const results = [];
-  if (r.data?.errors) {
-    console.error('[search] GQL errors:', r.data.errors[0]?.message);
-    return results;
-  }
-  const rails = r.data?.data?.hybridSearchResults?.rails || [];
-  for (const rail of rails) {
-    const contents = rail.contents || [];
-    for (const c of contents) {
-      const typename = c.__typename;
-      const data = c.movie || c.episode || c.tvShowDetails || c;
-      results.push({
-        id: data.id,
-        title: data.title,
-        type: typename?.toLowerCase() || 'unknown',
-        businessType: data.businessType,
-        image: data.image?.list || data.image?.cover || '',
-      });
-    }
-  }
-  return results;
+  return r.data;
 }
 
 module.exports = { search };
