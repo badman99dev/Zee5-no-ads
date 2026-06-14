@@ -302,7 +302,7 @@ async function loadHome() {
       if (!bid) continue;
       
       try {
-        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}${lang ? '${lang ? '&languages='+lang : '}languages='+lang : ''}`);
+        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}${lang ? '&languages='+lang : ''}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
         const freeItems = items;
@@ -346,7 +346,7 @@ async function loadFreeTab() {
       free5State.seenIds.add(bid);
       
       try {
-        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}${lang ? '${lang ? '&languages='+lang : '}languages='+lang : ''}`);
+        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}${lang ? '&languages='+lang : ''}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
         const freeItems = items;
@@ -387,7 +387,7 @@ async function loadMoviesTab() {
       if (!bid) continue;
       
       try {
-        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}${lang ? '${lang ? '&languages='+lang : '}languages='+lang : ''}`);
+        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}${lang ? '&languages='+lang : ''}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
         const freeItems = items;
@@ -422,7 +422,7 @@ async function loadTvShowsTab() {
       if (!bid) continue;
       
       try {
-        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}${lang ? '${lang ? '&languages='+lang : '}languages='+lang : ''}`);
+        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}${lang ? '&languages='+lang : ''}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
         const freeItems = items;
@@ -466,7 +466,7 @@ async function loadMoreCategories() {
       free5State.seenIds.add(bid);
       
       try {
-        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}${lang ? '${lang ? '&languages='+lang : '}languages='+lang : ''}`);
+        const c = await api(`${API}/collection/${bid}?limit=${ITEMS_PER_RAIL}${lang ? '&languages='+lang : ''}`);
         const cb = c.buckets || [];
         const items = cb.length ? cb.flatMap(x => x.items || []) : (c.items || []);
         const freeItems = items;
