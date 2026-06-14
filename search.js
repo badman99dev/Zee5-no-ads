@@ -34,3 +34,4 @@ async function search(query, lang = 'hi,en') {
 }
 
 module.exports = { search };
+// Force redeploy Sun Jun 14 19:11:20 UTC 2026
