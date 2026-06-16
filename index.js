@@ -69,6 +69,10 @@ function filterPremium(data) {
         );
       }
     });
+    // Remove buckets that became empty after filtering out premium content
+    data.buckets = data.buckets.filter(bucket => 
+      bucket.items && bucket.items.length > 0
+    );
   }
   
   // Handle direct items array
