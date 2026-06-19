@@ -1,5 +1,5 @@
 const express = require('express');
-const { initTokens } = require('./config');
+const { initTokens, authHeaders, redis } = require('./config');
 const { search } = require('./search');
 const { getCollection, getFree5, COLLECTIONS } = require('./free5');
 const { getSeasons, getEpisodes } = require('./episodes');
@@ -133,8 +133,16 @@ app.get('/free5', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 0;
     const lang = req.query.lang || '';
-    const data = await getFree5(page, lang);
-    res.json(filterPremium(data));
+    const cacheKey = `zee5:cache:free5:${page}:${lang}`;
+
+    const cached = await redis('GET', cacheKey);
+    if (cached) {
+      return res.json(JSON.parse(cached));
+    }
+
+    const data = filterPremium(await getFree5(page, lang));
+    await redis('SETEX', cacheKey, '21600', JSON.stringify(data));
+    res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -145,8 +153,16 @@ app.get('/collection/:id', async (req, res) => {
     const page = parseInt(req.query.page) || 0;
     const limit = parseInt(req.query.limit) || 25;
     const lang = req.query.languages || '';
-    const data = await getCollection(req.params.id, page, limit, lang);
-    res.json(filterPremium(data));
+    const cacheKey = `zee5:cache:collection:${req.params.id}:${page}:${limit}:${lang}`;
+
+    const cached = await redis('GET', cacheKey);
+    if (cached) {
+      return res.json(JSON.parse(cached));
+    }
+
+    const data = filterPremium(await getCollection(req.params.id, page, limit, lang));
+    await redis('SETEX', cacheKey, '21600', JSON.stringify(data));
+    res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

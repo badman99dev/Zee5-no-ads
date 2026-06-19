@@ -238,6 +238,7 @@ module.exports = {
   proxiedM3u8,
   buildImageUrls,
   mapImages,
+  redis,
   G_ID,
   ESK_SECRET,
   APP_VERSION,
