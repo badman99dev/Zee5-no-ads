@@ -105,6 +105,19 @@ async function initTokens() {
   console.log(`[config] tokens fresh | platform=${platformToken.slice(0, 20)}... | guest=${guestToken.slice(0, 20)}...`);
 }
 
+async function getTokens() {
+  await initTokens();
+  return {
+    platformToken,
+    guestToken,
+    deviceId,
+    expiresAt: tokenExpiry,
+    appVersion: APP_VERSION,
+    gId: G_ID,
+    xffIp: XFF_IP,
+  };
+}
+
 function cleanM3u8(hls) {
   if (!hls) return null;
   const path = Array.isArray(hls) ? hls[0] : hls;
@@ -239,6 +252,7 @@ module.exports = {
   buildImageUrls,
   mapImages,
   redis,
+  getTokens,
   G_ID,
   ESK_SECRET,
   APP_VERSION,

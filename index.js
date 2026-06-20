@@ -1,5 +1,5 @@
 const express = require('express');
-const { initTokens, authHeaders, redis } = require('./config');
+const { initTokens, authHeaders, redis, getTokens } = require('./config');
 const { search } = require('./search');
 const { getCollection, getFree5, COLLECTIONS } = require('./free5');
 const { getSeasons, getEpisodes } = require('./episodes');
@@ -170,6 +170,15 @@ app.get('/collection/:id', async (req, res) => {
 
 app.get('/collections', (req, res) => {
   res.json(COLLECTIONS);
+});
+
+app.get('/tokens', async (req, res) => {
+  try {
+    const tokens = await getTokens();
+    res.json(tokens);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.get('/details/:id', async (req, res) => {
